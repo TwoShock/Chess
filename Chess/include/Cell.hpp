@@ -15,6 +15,12 @@ namespace chess {
 		Cell();
 		Cell(PieceVariant piece);
 		[[nodiscard]] auto hasPiece()const->bool { return m_piece.has_value(); }
+		[[nodiscard]] auto getPiece()const->const PieceVariant* {
+			if (hasPiece()) {
+				return &m_piece.value();
+			}
+			return nullptr;
+		}
 
 		[[nodiscard]] auto display()const->std::string override;
 		friend std::ostream& operator<<(std::ostream& os, const Cell& cell);
