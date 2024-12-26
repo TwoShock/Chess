@@ -1,0 +1,80 @@
+# User-specific files (Visual Studio and IDE configs)
+*.suo
+*.user
+*.rsuser
+*.userosscache
+*.sln.docstates
+*.VC.db
+.vs/
+
+# Backup and temporary files
+*.bak
+*.swp
+*.tmp
+*.log
+*.cache
+
+# Build and output directories
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ll]og/
+[Bb]in/
+[Oo]bj/
+out/
+build/
+
+# Precompiled headers
+*.gch
+*.pch
+
+# C++ object files and binaries
+*.o
+*.so
+*.exe
+*.dll
+*.dylib
+*.app
+
+# Generated files and package management
+*.nupkg
+*.snupkg
+node_modules/
+packages/
+*.vcxproj.user
+*.vcxproj.filters
+*.sln
+*.vcxproj
+ChessTest/ChessTest.vcxproj
+ChessTest/packages.config
+
+ChessTest/packages.config
+# Temporary files
+Thumbs.db
+*.DS_Store
+*.stackdump
+
+# Test-specific files
+ChessTest/Debug/
+ChessTest/Release/
+ChessTest/.vs/
+ChessTest/*.log
+
+# Ignore environment files
+.env
+*.env.*
+
+# CMake files
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Miscellaneous
+*.zip
+*.tar.gz
+*.gz
