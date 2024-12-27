@@ -21,6 +21,12 @@ namespace chess {
 			}
 			return nullptr;
 		}
+		auto setPiece(std::optional<PieceVariant> piece) -> void {
+			if (!piece.has_value()) {
+				m_piece.reset();
+			}
+			m_piece = piece;
+		}
 
 		[[nodiscard]] auto display()const->std::string override;
 		friend std::ostream& operator<<(std::ostream& os, const Cell& cell);

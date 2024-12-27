@@ -16,15 +16,41 @@ namespace chess {
 			{Cell(Rook(Color::White)),Cell(Knight(Color::White)),Cell(Bishop(Color::White)),Cell(Queen(Color::White)),Cell(King(Color::White)),Cell(Bishop(Color::White)),Cell(Knight(Color::White)),Cell(Rook(Color::White))}
 		};
 	}
-	auto Board::getCell(Position position) const -> const Cell&
+	Board::Board(std::vector<std::vector<Cell>> initialState):m_cells(std::move(initialState))
+	{
+	}
+	auto Board::setPiece(Position position,PieceVariant piece) -> void
+	{
+		if (isValidCellPosition(position)) {
+			auto [x, y] = position;
+			m_cells[x][y].setPiece(piece);
+		}
+	}
+	auto Board::getCell(Position position) const -> const Cell*
 	{
 		auto [x, y] = position;
 		if (!isValidCellPosition(position)) {
-			throw std::runtime_error(std::format("Position {},{} is not a valid position",x,y));
+			return nullptr;
 		}
-		return m_cells[x][y];
+		return &m_cells[x][y];
 	}
 
+	auto Board::hasPiece(Position position) const -> bool {
+		const Cell* cell = getCell(position);
+		return cell->getPiece() != nullptr;
+	}
+	auto Board::hasPiece(Position position, Color color) const -> bool
+	{
+		if (!hasPiece(position)) {
+			return false;
+		}
+		const PieceVariant* piece = getCell(position)->getPiece();
+		bool isSameColor = false;
+		std::visit([&isSameColor,color](const auto& pieceValue) {
+			isSameColor = pieceValue.getColor() == color;
+			},*piece);
+		return isSameColor;
+	}
 	auto Board::isValidCellPosition(Position position)const -> bool
 	{
 		auto [x, y] = position;

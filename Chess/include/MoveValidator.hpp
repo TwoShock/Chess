@@ -1,6 +1,11 @@
 #pragma once
+#include <Move.hpp>
 namespace chess {
-	class MoveValidator {
-
+	enum class MoveStatus {
+		Invalid,
+		Valid
 	};
+	class Board;
+	[[nodiscard]] auto computeMoveStatus(Move move,const Board &board) -> MoveStatus;
+
 }
