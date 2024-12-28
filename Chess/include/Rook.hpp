@@ -1,4 +1,5 @@
 #pragma once
+#include <Move.hpp>
 #include "IDisplay.hpp"
 #include "Piece.hpp"
 #include "utils.hpp"
@@ -12,5 +13,7 @@ class Rook : public Piece, public IDisplay {
   auto display() const -> std::string override {
     return pieceDisplayHelper(getColor(), 'r');
   }
+  auto getPossibleMoves(Position startPosition,
+                        const Board& board) const -> Moves override;
 };
 }  // namespace chess

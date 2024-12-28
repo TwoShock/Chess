@@ -1,8 +1,8 @@
 #include <Bishop.hpp>
 #include <Board.hpp>
-#include <DiagonalMoveHelper.hpp>
 #include <Move.hpp>
 #include <MoveValidator.hpp>
+#include <MovementHelper.hpp>
 
 namespace chess {
 auto Bishop::getPossibleMoves(Position startPosition,
