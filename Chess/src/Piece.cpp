@@ -12,11 +12,6 @@ auto Piece::getOppositeColor() const -> Color {
     }
   }
 }
-auto Piece::getPossibleMoves(Position startPosition,
-                             const Board& board) const -> Moves {
-  return {};
-}
-
 auto Piece::isFriendly(const Piece& other) const -> bool {
   return other.getColor() == getColor();
 }

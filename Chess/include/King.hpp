@@ -12,5 +12,8 @@ class King : public Piece, public IDisplay {
   auto display() const -> std::string override {
     return pieceDisplayHelper(getColor(), 'k');
   }
+
+  auto getPossibleMoves(Position startPosition,
+                        const Board& board) const -> Moves override;
 };
 }  // namespace chess

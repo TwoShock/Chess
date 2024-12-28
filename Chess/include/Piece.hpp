@@ -15,7 +15,7 @@ class Piece {
   [[nodiscard]] auto getOppositeColor() const -> Color;
   [[nodiscard]] virtual auto getPossibleMoves(Position startPosition,
                                               const Board& board) const
-      -> Moves;
+      -> Moves = 0;
 
  private:
   [[nodiscard]] auto isFriendly(const Piece& other) const -> bool;
