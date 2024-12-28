@@ -20,6 +20,14 @@ auto readFileContents(const std::string& filepath) -> std::string {
 
   return buffer.str();
 }
+auto writeStringToFile(const std::string& filename,
+                       const std::string& content) -> void {
+  std::ofstream outFile(filename, std::ios::out);
+  if (!outFile) {
+    throw std::ios_base::failure("Failed to open file: " + filename);
+  }
+  outFile << content;
+}
 auto createEmptyBoard() -> chess::Board {
   using namespace chess;
   return chess::Board({

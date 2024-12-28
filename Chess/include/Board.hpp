@@ -15,6 +15,13 @@ class Board {
   auto setPiece(Position position, PieceVariant piece) -> void;
   auto hasPiece(Position position) const -> bool;
   auto hasPiece(Position position, Color color) const -> bool;
+  /*
+  This will set the highlighted flag on the cells of the board reachable from the piece
+  at position. This flag is consumed when displaying the board.
+  Nice for test in dev could come in handy later when adding graphics
+  */
+  auto highlightMoves(Position position) -> void;
+  auto resetHighlightedMoves() -> void;
 
   auto getCell(Position position) const -> const Cell*;
 

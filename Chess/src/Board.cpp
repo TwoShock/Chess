@@ -3,6 +3,7 @@
 #include <format>
 #include <ostream>
 
+#include <MoveValidator.hpp>
 #include "Cell.hpp"
 #include "Pawn.hpp"
 namespace chess {
@@ -26,6 +27,32 @@ auto Board::setPiece(Position position, PieceVariant piece) -> void {
   if (isValidCellPosition(position)) {
     auto [x, y] = position;
     m_cells[x][y].setPiece(piece);
+  }
+}
+auto Board::highlightMoves(Position startPosition) -> void {
+  resetHighlightedMoves();
+  if (!hasPiece(startPosition)) {
+    return;
+  }
+  const PieceVariant* piece = getCell(startPosition)->getPiece();
+  Moves possibleMoves;
+  std::visit(
+      [&possibleMoves, this, startPosition](const auto& piece) {
+        possibleMoves = piece.getPossibleMoves(startPosition, *this);
+      },
+      *piece);
+  Moves moves{filterValidMoves(possibleMoves, *this)};
+  for (const auto move : moves) {
+    const auto [_, endPosition] = move;
+    const auto [x, y] = endPosition;
+    m_cells[x][y].setHighlighted(true);
+  }
+}
+auto Board::resetHighlightedMoves() -> void {
+  for (auto& row : m_cells) {
+    for (auto& cell : row) {
+      cell.setHighlighted(false);
+    }
   }
 }
 auto Board::getCell(Position position) const -> const Cell* {
@@ -58,7 +85,7 @@ auto Board::hasPiece(Position position, Color color) const -> bool {
 }
 auto Board::isValidCellPosition(Position position) const -> bool {
   auto [x, y] = position;
-  if (x >= 0 && x <= getWidth() && y >= 0 && y <= getHeight()) {
+  if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
     return true;
   }
   return false;

@@ -29,6 +29,7 @@ class Cell : public IDisplay {
     }
     return std::nullopt;
   }
+  auto setHighlighted(bool highlight) -> void { m_highlight = highlight; }
   auto setPiece(std::optional<PieceVariant> piece) -> void {
     if (!piece.has_value()) {
       m_piece.reset();
@@ -41,5 +42,6 @@ class Cell : public IDisplay {
 
  private:
   std::optional<PieceVariant> m_piece;
+  bool m_highlight;
 };
 }  // namespace chess

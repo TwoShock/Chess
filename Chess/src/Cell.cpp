@@ -11,9 +11,13 @@
 #include <variant>
 
 namespace chess {
-Cell::Cell() : m_piece(std::nullopt) {}
-Cell::Cell(PieceVariant piece) : m_piece(std::move(piece)) {}
+Cell::Cell() : m_piece(std::nullopt), m_highlight(false) {}
+Cell::Cell(PieceVariant piece)
+    : m_piece(std::move(piece)), m_highlight(false) {}
 auto Cell::display() const -> std::string {
+  if (m_highlight) {
+    return "#";
+  }
   if (!m_piece)
     return " ";
   return std::visit(
