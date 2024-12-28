@@ -22,6 +22,13 @@ class Cell : public IDisplay {
     }
     return nullptr;
   }
+  [[nodiscard]] auto getPieceColor() const -> std::optional<Color> {
+    if (hasPiece()) {
+      return std::visit([](const auto& piece) { return piece.getColor(); },
+                        m_piece.value());
+    }
+    return std::nullopt;
+  }
   auto setPiece(std::optional<PieceVariant> piece) -> void {
     if (!piece.has_value()) {
       m_piece.reset();

@@ -46,9 +46,9 @@ class Board {
   }
 
   friend std::ostream& operator<<(std::ostream& os, const Board& cell);
+  auto isValidCellPosition(Position position) const -> bool;
 
  private:
-  auto isValidCellPosition(Position position) const -> bool;
   std::vector<std::vector<Cell>> m_cells;
 };
 }  // namespace chess

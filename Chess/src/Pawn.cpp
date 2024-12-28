@@ -5,17 +5,6 @@
 #include <MoveValidator.hpp>
 
 namespace chess {
-namespace {
-auto filterValidMoves(Moves moves, const Board& board) -> Moves {
-  Moves validMoves;
-  for (const auto& move : moves) {
-    if (computeMoveStatus(move, board) == MoveStatus::Valid) {
-      validMoves.insert(move);
-    }
-  }
-  return validMoves;
-}
-}  // namespace
 
 auto Pawn::getPossibleMoves(Position startPosition,
                             const Board& board) const -> Moves {
