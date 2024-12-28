@@ -1,6 +1,6 @@
 #include "Piece.hpp"
-
 #include "Board.hpp"
+
 namespace chess {
 auto Piece::getOppositeColor() const -> Color {
   switch (m_color) {

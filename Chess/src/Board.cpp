@@ -38,7 +38,10 @@ auto Board::getCell(Position position) const -> const Cell* {
 
 auto Board::hasPiece(Position position) const -> bool {
   const Cell* cell = getCell(position);
-  return cell->getPiece() != nullptr;
+  if (cell == nullptr) {
+    return false;
+  }
+  return cell->hasPiece();
 }
 auto Board::hasPiece(Position position, Color color) const -> bool {
   if (!hasPiece(position)) {

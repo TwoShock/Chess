@@ -12,7 +12,12 @@ struct MoveHash {
     return firstHash ^ (secondHash << 1);
   }
 };
-using Moves = std::unordered_set<Move, MoveHash>;
+struct MoveEq {
+  std::size_t operator()(const Move& lhs, const Move& rhs) const {
+    return lhs.first == rhs.first && lhs.second == rhs.second;
+  }
+};
+using Moves = std::unordered_set<Move, MoveHash, MoveEq>;
 auto mergeMoveSets(std::initializer_list<Moves> moves) -> Moves;
 
 }  // namespace chess

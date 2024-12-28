@@ -25,6 +25,9 @@ class Pawn : public Piece, public IDisplay {
     m_canBeTakenByEnpassant = canBeTaken;
   }
 
+  [[nodiscard]] auto isFirstMove() const { return m_firstMove; }
+  auto setIsFirstMove(bool isFirstMove) -> void { m_firstMove = isFirstMove; }
+
  private:
   [[nodiscard]] auto getForwardMoves(Position startPosition,
                                      const Board& board) const -> Moves;
@@ -33,6 +36,24 @@ class Pawn : public Piece, public IDisplay {
   [[nodiscard]] auto getEnpassantCaptureMoves(Position startPosition,
                                               const Board& board) const
       -> Moves;
+  [[nodiscard]] auto getForwardDirection() const -> int;
+  struct MoveSet {
+    Move m_forwardOnce;
+    Move m_forwardTwice;
+    Move m_leftDiagonal;
+    Move m_rightDiagonal;
+  };
+  struct PositionsOfInterest {
+    Position m_cellInFront;
+    Position m_twoCellsInFront;
+    Position m_leftDiagonal;
+    Position m_rightDiagonal;
+    Position m_leftOfStart;
+    Position m_rightOfStart;
+  };
+  [[nodiscard]] auto getMoveSet(Position startPosition) const -> MoveSet;
+  [[nodiscard]] auto getPositionsOfInterest(Position startPosition) const
+      -> PositionsOfInterest;
   bool m_firstMove;
   bool m_canBeTakenByEnpassant;
 };
