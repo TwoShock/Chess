@@ -4,10 +4,10 @@
 #include <unordered_set>
 #include <utils.hpp>
 #include <vector>
+#include <Position.hpp>
 
 namespace chess {
 namespace {
-using PositionSet = std::unordered_set<Position, PositionHash>;
 enum class Direction {
   TopRightDiagonal,
   TopLeftDiagonal,
@@ -74,12 +74,6 @@ auto getAllEndingPositionsForDirection(const Piece& piece,
 auto getDiagonalMoves(const Piece& piece,
                       Position startPosition,
                       const Board& board) -> Moves {
-  if (dynamic_cast<const Queen*>(&piece) == nullptr &&
-      dynamic_cast<const Bishop*>(&piece) == nullptr) {
-    throw std::runtime_error(
-        "Can not get diagonal moves for a piece that isn't a queen or a "
-        "bishop.");
-  }
   PositionSet topRightPositions{getAllEndingPositionsForDirection(
       piece, startPosition, board, Direction::TopRightDiagonal)};
   PositionSet topLeftPositions{getAllEndingPositionsForDirection(
@@ -104,13 +98,6 @@ auto getDiagonalMoves(const Piece& piece,
 auto getVerticalAndHorizontalMoves(const Piece& piece,
                                    Position startPosition,
                                    const Board& board) -> Moves {
-  if (dynamic_cast<const Rook*>(&piece) == nullptr &&
-      dynamic_cast<const Queen*>(&piece) == nullptr) {
-    throw std::runtime_error(
-        "Can not get vertical and horizontal moves for a piece that isn't a "
-        "queen or a "
-        "rook.");
-  }
   PositionSet leftPositions{getAllEndingPositionsForDirection(
       piece, startPosition, board, Direction::Left)};
   PositionSet rightPositions{getAllEndingPositionsForDirection(
@@ -130,6 +117,32 @@ auto getVerticalAndHorizontalMoves(const Piece& piece,
   updatePossibleMoves(rightPositions);
   updatePossibleMoves(forwardPositions);
   updatePossibleMoves(backwardPositions);
+  return possibleMoves;
+}
+auto getKnightTypeMoves(const Piece& piece,
+                        Position startPosition,
+                        const Board& board) -> Moves {
+  Moves possibleMoves;
+  auto [x, y] = startPosition;
+  Position topRight{x + 2, y + 1};
+  Position topLeft{x + 2, y - 1};
+  Position bottomRight{x - 2, y + 1};
+  Position bottomLeft{x - 2, y - 1};
+  auto updatePossibleMoves = [&piece, &board, &possibleMoves,
+                              &startPosition](Position position) {
+    bool isCellUnoccupied =
+        !board.hasPiece(position) && board.isValidCellPosition(position);
+    bool isCellOcuupiedWithEnemyPiece =
+        board.hasPiece(position, piece.getOppositeColor());
+    if (isCellUnoccupied || isCellOcuupiedWithEnemyPiece) {
+      possibleMoves.insert({startPosition, position});
+    }
+  };
+  updatePossibleMoves(topRight);
+  updatePossibleMoves(topLeft);
+  updatePossibleMoves(bottomRight);
+  updatePossibleMoves(bottomLeft);
+
   return possibleMoves;
 }
 }  // namespace chess

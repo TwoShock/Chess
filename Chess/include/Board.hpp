@@ -16,9 +16,9 @@ class Board {
   auto hasPiece(Position position) const -> bool;
   auto hasPiece(Position position, Color color) const -> bool;
   /*
-  This will set the highlighted flag on the cells of the board reachable from the piece
-  at position. This flag is consumed when displaying the board.
-  Nice for test in dev could come in handy later when adding graphics
+  This will set the highlighted flag on the cells of the board reachable from
+  the piece at position. This flag is consumed when displaying the board. Nice
+  for test in dev could come in handy later when adding graphics
   */
   auto highlightMoves(Position position) -> void;
   auto resetHighlightedMoves() -> void;
@@ -54,8 +54,10 @@ class Board {
 
   friend std::ostream& operator<<(std::ostream& os, const Board& cell);
   auto isValidCellPosition(Position position) const -> bool;
+  auto wouldMoveResultInCheck(Move move) const -> bool;
+  auto findKing(Color color) const -> Position;
 
  private:
-  std::vector<std::vector<Cell>> m_cells;
+  mutable std::vector<std::vector<Cell>> m_cells;
 };
 }  // namespace chess

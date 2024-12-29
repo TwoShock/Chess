@@ -20,10 +20,12 @@ auto Pawn::getForwardMoves(Position startPosition,
       getPositionsOfInterest(startPosition)};
   MoveSet possibleMoves{getMoveSet(startPosition)};
   if (m_firstMove && !board.hasPiece(positionsOfInterest.m_cellInFront) &&
-      !board.hasPiece(positionsOfInterest.m_twoCellsInFront)) {
+      !board.hasPiece(positionsOfInterest.m_twoCellsInFront) &&
+      board.isValidCellPosition(positionsOfInterest.m_twoCellsInFront)) {
     moves.insert(possibleMoves.m_forwardTwice);
   }
-  if (!board.hasPiece(positionsOfInterest.m_cellInFront)) {
+  if (board.isValidCellPosition(positionsOfInterest.m_cellInFront) &&
+      !board.hasPiece(positionsOfInterest.m_cellInFront)) {
     moves.insert(possibleMoves.m_forwardOnce);
   }
   return moves;
@@ -35,10 +37,12 @@ auto Pawn::getCaptureMoves(Position startPosition,
       getPositionsOfInterest(startPosition)};
   MoveSet possibleMoves{getMoveSet(startPosition)};
   Color opponentColor = getOppositeColor();
-  if (board.hasPiece(positionsOfInterest.m_rightDiagonal, opponentColor)) {
+  if (board.isValidCellPosition(positionsOfInterest.m_rightDiagonal) &&
+      board.hasPiece(positionsOfInterest.m_rightDiagonal, opponentColor)) {
     moves.insert(possibleMoves.m_rightDiagonal);
   }
-  if (board.hasPiece(positionsOfInterest.m_leftDiagonal, opponentColor)) {
+  if (board.isValidCellPosition(positionsOfInterest.m_leftDiagonal) &&
+      board.hasPiece(positionsOfInterest.m_leftDiagonal, opponentColor)) {
     moves.insert(possibleMoves.m_leftDiagonal);
   }
   return mergeMoveSets({getEnpassantCaptureMoves(startPosition, board), moves});

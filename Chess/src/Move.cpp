@@ -7,4 +7,8 @@ auto mergeMoveSets(std::initializer_list<Moves> moves) -> Moves {
   }
   return result;
 }
+auto reverseMove(Move move) -> Move {
+  auto [start, end] = move;
+  return {end, start};
+}
 }  // namespace chess

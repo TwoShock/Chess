@@ -9,4 +9,7 @@ namespace chess {
 [[nodiscard]] auto getVerticalAndHorizontalMoves(const Piece& piece,
                       Position startPosition,
                       const Board& board) -> Moves;
+[[nodiscard]] auto getKnightTypeMoves(const Piece& piece,
+                                      Position startPosition,
+                                      const Board& board) -> Moves;
 }

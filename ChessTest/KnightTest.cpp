@@ -47,7 +47,8 @@ TEST(KnightTest, CheckAllKnightPossibleMovesAtTheStartOfTheGame) {
 TEST(
     KnightTest,
     GivenAKnightPlacedInTheCenter_AndGivenTwoPotentialCaptures_ExpectMovementIsPossible) {
-    //the other two moves are blocked by a piece of the same color thats why only two moves are possible
+  // the other two moves are blocked by a piece of the same color thats why only
+  // two moves are possible
   const std::vector<std::vector<Cell>> intialBoardState{
       // clang-format off
 		{Cell(Rook(Color::Black)),Cell(Knight(Color::Black)),Cell(Bishop(Color::Black)),Cell(Queen(Color::Black)),Cell(King(Color::Black)),Cell(Bishop(Color::Black)),Cell(Knight(Color::Black)),Cell(Rook(Color::Black))},
@@ -65,4 +66,31 @@ TEST(
   const Knight* knight = board.getPiece<Knight>(knightPos);
   expectKnightPossibleMovesGivenStartingPosition(
       knightPos, board, {{{knightPos, {6, 2}}, {knightPos, {6, 4}}}});
+}
+
+TEST(
+    KnightTest,
+    sideKnightMovementTest) {
+  // the other two moves are blocked by a piece of the same color thats why only
+  // two moves are possible
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(Knight(Color::White)), Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(Rook(Color::White)),   Cell(Knight(Color::White)), Cell(),                     Cell(Queen(Color::White)), Cell(King(Color::White)),   Cell(Bishop(Color::White)), Cell(Knight(Color::White)), Cell(Rook(Color::White))}//7
+      // clang-format on
+  };
+  Board board{intialBoardState};
+  const Position knightPos{4, 0};
+  board.highlightMoves(knightPos);
+  std::stringstream ss;
+  ss << board;
+  const std::string expectedMovement = test::readFileContents("resources/SideKnightMovementTest.txt");
+  EXPECT_EQ(expectedMovement, ss.str());
 }

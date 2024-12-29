@@ -1,11 +1,14 @@
-#include "Board.hpp"
+#include <Board.hpp>
+
+#include <Cell.hpp>
+#include <King.hpp>
+#include <MoveValidator.hpp>
+#include <MovementHelper.hpp>
+#include <Pawn.hpp>
+#include <Piece.hpp>
 
 #include <format>
 #include <ostream>
-
-#include <MoveValidator.hpp>
-#include "Cell.hpp"
-#include "Pawn.hpp"
 namespace chess {
 Board::Board() {
   m_cells = {
@@ -89,6 +92,150 @@ auto Board::isValidCellPosition(Position position) const -> bool {
     return true;
   }
   return false;
+}
+
+namespace {
+auto currentPlayer(Move move, const Board& board) -> Color {
+  auto [startPosition, _] = move;
+  if (board.hasPiece(startPosition, Color::White)) {
+    return Color::White;
+  }
+  return Color::Black;
+}
+auto getEndingPositionsThatHaveEnemyPieces(const Moves& moves,
+                                           const Board& board,
+                                           Color enemyColor) -> PositionSet {
+  PositionSet endingPositionWithEnemyPieces;
+  for (const Move& move : moves) {
+    const auto [_, endPosition] = move;
+    if (board.hasPiece(endPosition, enemyColor)) {
+      endingPositionWithEnemyPieces.insert(endPosition);
+    }
+  }
+  return endingPositionWithEnemyPieces;
+}
+namespace {
+struct PotentialChecks {
+  PositionSet m_diagonalChecks;
+  PositionSet m_horizontalOrVerticalChecks;
+  PositionSet m_knightTypeChecks;
+};
+}  // namespace
+auto getPotentialCheckPositions(const Board& board,
+                                Color player) -> PotentialChecks {
+  Position kingPosition{board.findKing(player)};
+  const King* king = board.getPiece<King>(kingPosition);
+  const Moves diagonalMovesFromKingsPerspective =
+      getDiagonalMoves(*king, kingPosition, board);
+  const Moves horizontalAndVerticalMovesFromKingsPerspective =
+      getVerticalAndHorizontalMoves(*king, kingPosition, board);
+  const Moves knightTypeMovesFromKingsPerspective =
+      getKnightTypeMoves(*king, kingPosition, board);
+
+  const PositionSet diagonalEnemies{getEndingPositionsThatHaveEnemyPieces(
+      diagonalMovesFromKingsPerspective, board, king->getOppositeColor())};
+  const PositionSet horizontalOrVerticalEnemies{
+      getEndingPositionsThatHaveEnemyPieces(
+          horizontalAndVerticalMovesFromKingsPerspective, board,
+          king->getOppositeColor())};
+  const PositionSet knightEnemies{getEndingPositionsThatHaveEnemyPieces(
+      knightTypeMovesFromKingsPerspective, board, king->getOppositeColor())};
+  return {diagonalEnemies, horizontalOrVerticalEnemies, knightEnemies};
+}
+
+auto canBeCheckedByBishopOrQueen(const PositionSet& diagonlPositions,
+                                 const Board& board,
+                                 Color enemy) -> bool {
+  for (const auto& position : diagonlPositions) {
+    if (board.hasPiece<Bishop>(position, enemy) ||
+        board.hasPiece<Queen>(position, enemy)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto canBeCheckedByRookOrQueen(const PositionSet& horizotnalOrVerticalPosition,
+                               const Board& board,
+                               Color enemy) -> bool {
+  for (const auto& position : horizotnalOrVerticalPosition) {
+    if (board.hasPiece<Rook>(position, enemy) ||
+        board.hasPiece<Queen>(position, enemy)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto canBeCheckedByKnight(const PositionSet& knightPositions,
+                          const Board& board,
+                          Color enemy) -> bool {
+  for (const auto& position : knightPositions) {
+    if (board.hasPiece<Knight>(position, enemy)) {
+      return true;
+    }
+  }
+  return false;
+}
+auto canBeCheckedByPawn(const Board& board,
+                        const Position kingPosition,
+                        Color player,
+                        Color enemy) -> bool {
+  auto [x, y] = kingPosition;
+  const int pawnHorizontalDirection = player == Color::White ? -1 : 1;
+  const Position leftDiagonal{x + pawnHorizontalDirection, y - 1};
+  const Position rightDiagonal{x + pawnHorizontalDirection, y + 1};
+
+  if (board.hasPiece<Pawn>(leftDiagonal, enemy) ||
+      board.hasPiece<Pawn>(rightDiagonal, enemy)) {
+    return true;
+  }
+  return false;
+}
+}  // namespace
+
+auto Board::wouldMoveResultInCheck(Move move) const -> bool {
+  const Color player{currentPlayer(move, *this)};
+  const Color enemy{player == Color::White ? Color::Black : Color::White};
+  const auto [startPosition, endPosition] = move;
+  const Cell originalStart = m_cells[startPosition.first][startPosition.second];
+  const Cell originalEnd = m_cells[endPosition.first][endPosition.second];
+  // make the move
+  m_cells[startPosition.first][startPosition.second] = Cell();
+  m_cells[endPosition.first][endPosition.second] = originalStart;
+  //
+  const Position kingPosition{findKing(player)};
+  const auto [potentialDiagonalChecks, potentialHorizontalOrVerticalChecks,
+              potentialKnightChecks] =
+      getPotentialCheckPositions(*this, player);
+  const bool checkedDiagonally =
+      canBeCheckedByBishopOrQueen(potentialDiagonalChecks, *this, enemy);
+  const bool checkedHorizontallyOrVertically =
+      canBeCheckedByRookOrQueen(potentialHorizontalOrVerticalChecks, *this, enemy);
+  const bool checkedByKnights =
+      canBeCheckedByKnight(potentialKnightChecks, *this, enemy);
+  const bool checkedByPawns =
+      canBeCheckedByPawn(*this, kingPosition, player, enemy);
+
+  // undo the move
+  m_cells[startPosition.first][startPosition.second] = originalStart;
+  m_cells[endPosition.first][endPosition.second] = originalEnd;
+  //
+  return checkedDiagonally || checkedHorizontallyOrVertically ||
+         checkedByKnights || checkedByPawns;
+}
+
+auto Board::findKing(Color color) const -> Position {
+  for (int x = 0; x < getWidth(); x++) {
+    for (int y = 0; y < getHeight(); y++) {
+      if (hasPiece<King>({x, y}, color)) {
+        return {x, y};
+      }
+    }
+  }
+  std::string colorString = color == Color::White ? "White" : "Black";
+  throw new std::runtime_error("Board state is invalid as there is no " +
+                               colorString + "King.");
 }
 
 std::ostream& operator<<(std::ostream& os, const Board& board) {

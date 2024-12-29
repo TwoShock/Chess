@@ -19,6 +19,9 @@ auto King::getPossibleMoves(Position startPosition,
       topLeft, topRight, bottomLeft, bottomRight};
   Moves possibleMoves;
   for (const auto& position : possibleEndingPositions) {
+    if (!board.isValidCellPosition(position)) {
+      continue;
+    }
     if (!board.hasPiece(position) ||
         board.hasPiece(position, getOppositeColor())) {
       possibleMoves.insert({startPosition, position});
