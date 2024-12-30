@@ -42,3 +42,51 @@ TEST(
       "AndGivenTheyHaveTheirKingsBehindThem_RookMoves.txt");
   EXPECT_EQ(expectedRookMovement, ss.str());
 }
+TEST(CheckTest,
+     GivenKingFacingEnemyPawn_ExpectKingCannotMoveIntoPawnCaptureSquares) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//0
+{Cell(),                     Cell(),                     Cell(),                     Cell()                  , Cell(),                     Cell(),                     Cell(),                     Cell()},//1
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(Pawn(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//6
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::White)), Cell(),                     Cell(),                     Cell(),                     Cell()},//7
+      // clang-format on
+  };
+  Board board{intialBoardState};
+  const Position kingPosition{7, 3};
+  board.highlightMoves(kingPosition);
+  std::stringstream ss;
+  ss << board;
+  const std::string expectedKingMovement =
+      test::readFileContents("resources/KingFacingEnemyPawn_Movements.txt");
+  EXPECT_EQ(expectedKingMovement, ss.str());
+}
+TEST(CheckTest,
+     GivenKingFacingEnemyKnight_ExpectKingCannotMoveIntoKnightCaptureSquares) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::Black)),   Cell(),                     Cell(),                     Cell(),                     Cell()},//0
+{Cell(),                     Cell(),                     Cell(),                   Cell()                  ,   Cell(),                     Cell(),                     Cell(),                     Cell()},//1
+{Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                   Cell(Knight(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell(),                     Cell()},//6
+{Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::White)),   Cell(),                     Cell(),                     Cell(),                     Cell()},//7
+      // clang-format on
+  };
+  Board board{intialBoardState};
+  const Position kingPosition{7, 3};
+  board.highlightMoves(kingPosition);
+  std::stringstream ss;
+  ss << board;
+  const std::string expectedKingMovement =
+      test::readFileContents("resources/KingFacingEnemyKnight_Movements.txt");
+  EXPECT_EQ(expectedKingMovement, ss.str());
+}
