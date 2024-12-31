@@ -9,4 +9,12 @@ auto getOppositeColor(Color color) -> Color {
       return Color::Black;
   };
 }
+auto toString(Color color) -> std::string {
+  switch (color) {
+    case Color::Black:
+      return "Black";
+    case Color::White:
+      return "White";
+  };
+}
 }  // namespace chess

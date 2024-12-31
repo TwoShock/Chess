@@ -1,14 +1,40 @@
 #pragma once
 #include <Board.hpp>
 #include <Turn.hpp>
+#include <expected>
+#include <functional>
+#include <unordered_map>
+#include <variant>
 namespace chess {
-
+enum class GameError { CanNotMoveEmptyCell, CanNotMoveEnemyPiece, InvalidMove };
+enum class PromotionChoice { Queen = 1, Rook = 2, Bishop = 3, Knight = 4 };
+using EnpassantMap = std::unordered_map<Position, int>;
+using PromotionCallback = std::function<PromotionChoice(Position, Color)>;
+using PrePromotionChoiceResponseCallback = std::function<void(const Board&)>;
 class GameManager {
  public:
-  GameManager() = default;
+  GameManager(Board board);
+  auto playTurn(Move move) -> std::expected<void, GameError>;
+  auto switchTurn() -> void;
+  [[nodiscard]] auto getCurrentTurn() const -> Turn;
+  [[nodiscard]] auto getOtherPlayersTurn() const -> Turn;
+  auto setPromotionCallback(PromotionCallback promotionCallback) -> void;
+  auto setPrePromotionChoiceResponseCallback(PrePromotionChoiceResponseCallback ) -> void;
+  [[nodiscard]] auto getBoard() const -> const Board&;
 
  private:
+  auto makePawnMove(Move move) -> void;
+  auto makeMove(Move move) -> void;
+  auto promotePawn(Position position, PromotionChoice promotionChoice) -> void;
+  auto shouldSetEnpassant(Move move) const -> bool;
+  //sets enpassant status to false for all pawns belonging to player
+  auto setEnpassantStatusToFalseForAllPawns(Turn player) -> void;
+
   Board m_board;
   Turn m_turn;
+  int m_turnCounter;
+  PromotionCallback m_promotionCallback;
+  PrePromotionChoiceResponseCallback m_prePromotionChocieResponseCallback;
+  
 };
 }  // namespace chess

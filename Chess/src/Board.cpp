@@ -26,10 +26,15 @@ Board::Board() {
 }
 Board::Board(std::vector<std::vector<Cell>> initialState)
     : m_cells(std::move(initialState)) {}
-auto Board::setPiece(Position position, PieceVariant piece) -> void {
+auto Board::setPiece(Position position,
+                     std::optional<PieceVariant> piece) -> void {
   if (isValidCellPosition(position)) {
     auto [x, y] = position;
-    m_cells[x][y].setPiece(piece);
+    if (piece.has_value()) {
+      m_cells[x][y].setPiece(piece);
+    } else {
+      m_cells[x][y] = Cell();
+    }
   }
 }
 auto Board::highlightMoves(Position startPosition) -> void {
@@ -210,8 +215,8 @@ auto Board::wouldMoveResultInCheck(Move move) const -> bool {
       getPotentialCheckPositions(*this, player);
   const bool checkedDiagonally =
       canBeCheckedByBishopOrQueen(potentialDiagonalChecks, *this, enemy);
-  const bool checkedHorizontallyOrVertically =
-      canBeCheckedByRookOrQueen(potentialHorizontalOrVerticalChecks, *this, enemy);
+  const bool checkedHorizontallyOrVertically = canBeCheckedByRookOrQueen(
+      potentialHorizontalOrVerticalChecks, *this, enemy);
   const bool checkedByKnights =
       canBeCheckedByKnight(potentialKnightChecks, *this, enemy);
   const bool checkedByPawns =
@@ -236,6 +241,16 @@ auto Board::findKing(Color color) const -> Position {
   std::string colorString = color == Color::White ? "White" : "Black";
   throw new std::runtime_error("Board state is invalid as there is no " +
                                colorString + "King.");
+}
+
+auto Board::scanPieces(BoardScanCallback callback) -> void {
+  for (int x = 0; x < getWidth(); x++) {
+    for (int y = 0; y < getHeight(); y++) {
+      if (hasPiece({x, y})) {
+        callback(*const_cast<PieceVariant*>(m_cells[x][y].getPiece()), {x, y});
+      }
+    }
+  }
 }
 
 std::ostream& operator<<(std::ostream& os, const Board& board) {

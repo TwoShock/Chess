@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_set>
+#include <string>
 #include <utility>
 namespace chess {
 using Position = std::pair<int, int>;
@@ -11,4 +12,7 @@ struct PositionHash {
 using PositionSet = std::unordered_set<Position, PositionHash>;
 [[nodiscard]] auto mergePositionSets(
     const std::vector<PositionSet>& postionSets) -> PositionSet;
+[[nodiscard]] auto toChessCoordinates(Position position) -> std::string;
+[[nodiscard]] auto toString(Position position) -> std::string;
+static Position NotFound{-1, -1};
 }  // namespace chess

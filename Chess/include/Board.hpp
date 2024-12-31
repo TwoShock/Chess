@@ -1,9 +1,12 @@
 #pragma once
+#include <Cell.hpp>
+#include <Position.hpp>
+
+#include <functional>
 #include <vector>
-#include "Cell.hpp"
-#include "Position.hpp"
 namespace chess {
 constexpr auto BoardSize = 8;
+using BoardScanCallback = std::function<void(PieceVariant&,Position)>;
 class Board {
  public:
   Board();
@@ -12,7 +15,7 @@ class Board {
   [[nodiscard]] auto getWidth() const -> size_t { return BoardSize; }
   [[nodiscard]] auto getHeight() const -> size_t { return BoardSize; }
 
-  auto setPiece(Position position, PieceVariant piece) -> void;
+  auto setPiece(Position position, std::optional<PieceVariant> piece) -> void;
   auto hasPiece(Position position) const -> bool;
   auto hasPiece(Position position, Color color) const -> bool;
   /*
@@ -56,6 +59,7 @@ class Board {
   auto isValidCellPosition(Position position) const -> bool;
   auto wouldMoveResultInCheck(Move move) const -> bool;
   auto findKing(Color color) const -> Position;
+  auto scanPieces(BoardScanCallback callback) -> void;
 
  private:
   mutable std::vector<std::vector<Cell>> m_cells;
