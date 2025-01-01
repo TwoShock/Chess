@@ -6,7 +6,7 @@
 #include <vector>
 namespace chess {
 constexpr auto BoardSize = 8;
-using BoardScanCallback = std::function<void(PieceVariant&,Position)>;
+using BoardScanCallback = std::function<void(PieceVariant&, Position)>;
 class Board {
  public:
   Board();
@@ -60,6 +60,9 @@ class Board {
   auto wouldMoveResultInCheck(Move move) const -> bool;
   auto findKing(Color color) const -> Position;
   auto scanPieces(BoardScanCallback callback) -> void;
+  auto setCells(std::vector<std::vector<Cell>> cells) -> void {
+    m_cells = std::move(cells);
+  }
 
  private:
   mutable std::vector<std::vector<Cell>> m_cells;
