@@ -63,6 +63,7 @@ class Board {
   auto setCells(std::vector<std::vector<Cell>> cells) -> void {
     m_cells = std::move(cells);
   }
+  auto movePiece(const PieceVariant& piece, Move move) -> void;
 
  private:
   mutable std::vector<std::vector<Cell>> m_cells;

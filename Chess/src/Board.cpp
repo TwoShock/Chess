@@ -253,6 +253,12 @@ auto Board::scanPieces(BoardScanCallback callback) -> void {
   }
 }
 
+auto Board::movePiece(const PieceVariant& piece, Move move) -> void {
+  const auto [startPosition, endPosition] = move;
+  setPiece(endPosition, piece);
+  setPiece(startPosition, std::nullopt);
+}
+
 std::ostream& operator<<(std::ostream& os, const Board& board) {
   const std::string horizontal_line = "  +---+---+---+---+---+---+---+---+\n";
   os << horizontal_line;

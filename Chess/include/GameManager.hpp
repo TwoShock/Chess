@@ -19,15 +19,19 @@ class GameManager {
   [[nodiscard]] auto getCurrentTurn() const -> Turn;
   [[nodiscard]] auto getOtherPlayersTurn() const -> Turn;
   auto setPromotionCallback(PromotionCallback promotionCallback) -> void;
-  auto setPrePromotionChoiceResponseCallback(PrePromotionChoiceResponseCallback ) -> void;
+  auto setPrePromotionChoiceResponseCallback(PrePromotionChoiceResponseCallback)
+      -> void;
   [[nodiscard]] auto getBoard() const -> const Board&;
 
  private:
   auto makePawnMove(Move move) -> void;
+  auto makeKingMove(Move move) -> void;
+  auto makeCastlingMove(Move move) -> void;
+  auto isCastlingMove(Move move) const -> bool;
   auto makeMove(Move move) -> void;
   auto promotePawn(Position position, PromotionChoice promotionChoice) -> void;
   auto shouldSetEnpassant(Move move) const -> bool;
-  //sets enpassant status to false for all pawns belonging to player
+  // sets enpassant status to false for all pawns belonging to player
   auto setEnpassantStatusToFalseForAllPawns(Turn player) -> void;
 
   Board m_board;
@@ -35,6 +39,5 @@ class GameManager {
   int m_turnCounter;
   PromotionCallback m_promotionCallback;
   PrePromotionChoiceResponseCallback m_prePromotionChocieResponseCallback;
-  
 };
 }  // namespace chess

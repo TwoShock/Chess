@@ -62,6 +62,7 @@ auto defaultPrePromotionChocieResponseCallback(const Board& board) -> void {
 GameManager::GameManager(Board board)
     : m_board(std::move(board)),
       m_turn(Turn::White),
+      m_turnCounter(0),
       m_promotionCallback(defaultPromotionCallback),
       m_prePromotionChocieResponseCallback(
           defaultPrePromotionChocieResponseCallback) {}
@@ -151,7 +152,58 @@ auto GameManager::makePawnMove(Move move) -> void {
     pawn->setCanBeTakenByEnpassant(true);
   }
 }
-// namespace
+auto GameManager::makeKingMove(Move move) -> void {
+  const auto [startPosition, endPosition] = move;
+  const King* king = m_board.getPiece<King>(startPosition);
+  if (isCastlingMove(move)) {
+    makeCastlingMove(move);
+  } else {
+    m_board.movePiece(*m_board.getPiece<King>(startPosition), move);
+    King* king = const_cast<King*>(m_board.getPiece<King>(endPosition));
+    king->setHasMoved(true);
+  }
+}
+namespace {
+auto findCastlingMoveFromMove(Move move,
+                              const std::vector<CastlingMove>& castlingMoves)
+    -> CastlingMove {
+  CastlingMove cMove;
+  for (const auto& castlingMove : castlingMoves) {
+    if (castlingMove.first == move) {
+      return cMove;
+    }
+  }
+  return {};
+}
+}  // namespace
+auto GameManager::makeCastlingMove(Move move) -> void {
+  const auto [startPosition, _] = move;
+  const King* king = m_board.getPiece<King>(startPosition);
+  const CastlingMove castlingMove = findCastlingMoveFromMove(
+      move, king->getCastlingMoves(startPosition, m_board));
+  const auto [kingMove, rookMove] = castlingMove;
+  {
+    const King* king = m_board.getPiece<King>(kingMove.first);
+    const Rook* rook = m_board.getPiece<Rook>(rookMove.first);
+
+    m_board.movePiece(*king, kingMove);
+    m_board.movePiece(*rook, rookMove);
+  }
+  {
+    King* king = const_cast<King*>(m_board.getPiece<King>(kingMove.second));
+    Rook* rook = const_cast<Rook*>(m_board.getPiece<Rook>(rookMove.second));
+    king->setHasCastled(true);
+    king->setHasMoved(true);
+    rook->setHasMoved(true);
+  }
+}
+
+auto GameManager::isCastlingMove(Move move) const -> bool {
+  const auto [startPosition, endPosition] = move;
+  const auto [xStart, yStart] = startPosition;
+  const auto [xEnd, yEnd] = endPosition;
+  return std::abs(yStart - yEnd) == 2;
+}
 
 // makeMove is called under the assumption that the move is valid and can be
 // made
@@ -165,10 +217,13 @@ auto GameManager::makeMove(Move move) -> void {
         if (std::is_same_v<T, Pawn>) {
           makePawnMove(move);
         } else if (std::is_same_v<T, King>) {
-          // todo: implement castling logic here
+          makeKingMove(move);
         } else {
-          m_board.setPiece(endPosition, piece);
-          m_board.setPiece(startPosition, std::nullopt);
+          m_board.movePiece(piece, move);
+          if (std::is_same_v<T, Rook>) {
+            const_cast<Rook*>(m_board.getPiece<Rook>(endPosition))
+                ->setHasMoved(true);
+          }
         }
       },
       *pieceVariant);
