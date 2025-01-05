@@ -64,13 +64,14 @@ TEST(
   const Board board{intialBoardState};
   const Position knightPos{4, 3};
   const Knight* knight = board.getPiece<Knight>(knightPos);
-  expectKnightPossibleMovesGivenStartingPosition(
-      knightPos, board, {{{knightPos, {6, 2}}, {knightPos, {6, 4}}}});
+  expectKnightPossibleMovesGivenStartingPosition(knightPos, board,
+                                                 {{{knightPos, {6, 2}},
+                                                   {knightPos, {6, 4}},
+                                                   {knightPos, {5, 1}},
+                                                   {knightPos, {5, 5}}}});
 }
 
-TEST(
-    KnightTest,
-    sideKnightMovementTest) {
+TEST(KnightTest, sideKnightMovementTest) {
   // the other two moves are blocked by a piece of the same color thats why only
   // two moves are possible
   const std::vector<std::vector<Cell>> intialBoardState{
@@ -91,6 +92,7 @@ TEST(
   board.highlightMoves(knightPos);
   std::stringstream ss;
   ss << board;
-  const std::string expectedMovement = test::readFileContents("resources/SideKnightMovementTest.txt");
+  const std::string expectedMovement =
+      test::readFileContents("resources/SideKnightMovementTest.txt");
   EXPECT_EQ(expectedMovement, ss.str());
 }

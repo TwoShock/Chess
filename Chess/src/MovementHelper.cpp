@@ -1,10 +1,10 @@
 #include <Move.hpp>
 #include <MovementHelper.hpp>
+#include <Position.hpp>
 #include <stdexcept>
 #include <unordered_set>
 #include <utils.hpp>
 #include <vector>
-#include <Position.hpp>
 
 namespace chess {
 namespace {
@@ -124,10 +124,13 @@ auto getKnightTypeMoves(const Piece& piece,
                         const Board& board) -> Moves {
   Moves possibleMoves;
   auto [x, y] = startPosition;
-  Position topRight{x + 2, y + 1};
-  Position topLeft{x + 2, y - 1};
-  Position bottomRight{x - 2, y + 1};
-  Position bottomLeft{x - 2, y - 1};
+  const Position upRight{x + 2, y + 1};
+  const Position upLeft{x + 2, y - 1};
+  const Position downRight{x - 2, y + 1};
+  const Position downLeft{x - 2, y - 1};
+  const Position rightUp{x + 1, y + 2};
+  const Position leftUp{x + 1, y - 2};
+
   auto updatePossibleMoves = [&piece, &board, &possibleMoves,
                               &startPosition](Position position) {
     bool isCellUnoccupied =
@@ -138,10 +141,12 @@ auto getKnightTypeMoves(const Piece& piece,
       possibleMoves.insert({startPosition, position});
     }
   };
-  updatePossibleMoves(topRight);
-  updatePossibleMoves(topLeft);
-  updatePossibleMoves(bottomRight);
-  updatePossibleMoves(bottomLeft);
+  updatePossibleMoves(upRight);
+  updatePossibleMoves(upLeft);
+  updatePossibleMoves(downRight);
+  updatePossibleMoves(downLeft);
+  updatePossibleMoves(rightUp);
+  updatePossibleMoves(leftUp);
 
   return possibleMoves;
 }
