@@ -259,6 +259,22 @@ auto Board::movePiece(const PieceVariant& piece, Move move) -> void {
   setPiece(startPosition, std::nullopt);
 }
 
+auto Board::getPossibleMoves(Position pos) const -> Moves {
+  if (hasPiece(pos)) {
+    const PieceVariant* piece = getCell(pos)->getPiece();
+    return std::visit(
+        [this, pos](const auto& p) { return p.getPossibleMoves(pos, *this); },
+        *piece);
+  }
+  return {};
+}
+
+auto Board::isKingInCheck(Color color) const -> bool {
+  const Position kingPosition = findKing(color);
+  const King* king = getPiece<King>(kingPosition);
+  return wouldMoveResultInCheck({kingPosition, kingPosition});
+}
+
 std::ostream& operator<<(std::ostream& os, const Board& board) {
   const std::string horizontal_line = "  +---+---+---+---+---+---+---+---+\n";
   os << horizontal_line;

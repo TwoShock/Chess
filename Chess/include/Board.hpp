@@ -64,6 +64,8 @@ class Board {
     m_cells = std::move(cells);
   }
   auto movePiece(const PieceVariant& piece, Move move) -> void;
+  auto getPossibleMoves(Position pos) const -> Moves;
+  auto isKingInCheck(Color color) const -> bool;
 
  private:
   mutable std::vector<std::vector<Cell>> m_cells;

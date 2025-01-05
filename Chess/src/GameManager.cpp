@@ -270,4 +270,34 @@ auto GameManager::setEnpassantStatusToFalseForAllPawns(Turn player) -> void {
 auto GameManager::getBoard() const -> const Board& {
   return m_board;
 }
+
+auto GameManager::isCheckMate() const -> bool {
+  if (!m_board.isKingInCheck(turnToColor(m_turn))) {
+    return false;
+  }
+  bool checkMate = true;
+  m_board.scanPieces(
+      [this, &checkMate](PieceVariant& piece, Position position) {
+        if (m_board.hasPiece(position, turnToColor(m_turn)) &&
+            !m_board.getPossibleMoves(position).empty()) {
+          checkMate = false;
+        }
+      });
+  return checkMate;
+}
+
+auto GameManager::isStaleMate() const -> bool {
+  if (m_board.isKingInCheck(turnToColor(m_turn))) {
+    return false;
+  }
+  bool staleMate = true;
+  m_board.scanPieces(
+      [this, &staleMate](PieceVariant& piece, Position position) {
+        if (m_board.hasPiece(position, turnToColor(m_turn)) &&
+            !m_board.getPossibleMoves(position).empty()) {
+          staleMate = false;
+        }
+      });
+  return staleMate;
+}
 }  // namespace chess

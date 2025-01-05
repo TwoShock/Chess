@@ -22,6 +22,8 @@ class GameManager {
   auto setPrePromotionChoiceResponseCallback(PrePromotionChoiceResponseCallback)
       -> void;
   [[nodiscard]] auto getBoard() const -> const Board&;
+  [[nodiscard]] auto isCheckMate() const -> bool;
+  [[nodiscard]] auto isStaleMate() const -> bool;
 
  private:
   auto makePawnMove(Move move) -> void;
@@ -34,7 +36,7 @@ class GameManager {
   // sets enpassant status to false for all pawns belonging to player
   auto setEnpassantStatusToFalseForAllPawns(Turn player) -> void;
 
-  Board m_board;
+  mutable Board m_board;
   Turn m_turn;
   int m_turnCounter;
   PromotionCallback m_promotionCallback;

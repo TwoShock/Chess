@@ -147,3 +147,63 @@ TEST(GameManagerTest, PawnPromotionTest) {
   const Moves moves = king->getPossibleMoves(blackKingPosition, board);
   EXPECT_EQ(3u, moves.size());
 }
+
+TEST(GameManagerTest, GivenCheckMateSituation_ExpectGameMangerToDetectIt) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(Queen(Color::White)),  Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(Queen(Color::White)),  Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::White)), Cell(),                     Cell(),                     Cell(),                     Cell()}//7
+      // clang-format on
+  };
+  GameManager gameManager{Board{intialBoardState}};
+  gameManager.switchTurn();
+  EXPECT_TRUE(gameManager.isCheckMate());
+  EXPECT_FALSE(gameManager.isStaleMate());
+}
+
+TEST(GameManagerTest, GivenNoCheckMate_ExpectGameMangerToDetectIt) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(Queen(Color::White)),  Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::White)), Cell(),                     Cell(),                     Cell(),                     Cell()}//7
+      // clang-format on
+  };
+  GameManager gameManager{Board{intialBoardState}};
+  gameManager.switchTurn();
+  EXPECT_FALSE(gameManager.isCheckMate());
+  EXPECT_FALSE(gameManager.isStaleMate());
+}
+
+TEST(GameManagerTest,GivenStaleMateSituation_ExpectGameMangerToDetectIt ) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(Queen(Color::White)),  Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(Queen(Color::White)),  Cell(King(Color::White)), Cell(Queen(Color::White)),  Cell(),                     Cell(),                     Cell()}//7
+      // clang-format on
+  };
+  GameManager gameManager{Board{intialBoardState}};
+  gameManager.switchTurn();
+  EXPECT_TRUE(gameManager.isStaleMate());
+  EXPECT_FALSE(gameManager.isCheckMate());
+}
