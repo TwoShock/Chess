@@ -20,5 +20,6 @@ struct MoveEq {
 using Moves = std::unordered_set<Move, MoveHash, MoveEq>;
 auto mergeMoveSets(std::initializer_list<Moves> moves) -> Moves;
 auto reverseMove(Move move) -> Move;
+[[nodiscard]] auto toMove(const std::string& move) -> Move;
 
 }  // namespace chess

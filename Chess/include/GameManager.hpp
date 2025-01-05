@@ -11,6 +11,7 @@ enum class PromotionChoice { Queen = 1, Rook = 2, Bishop = 3, Knight = 4 };
 using EnpassantMap = std::unordered_map<Position, int>;
 using PromotionCallback = std::function<PromotionChoice(Position, Color)>;
 using PrePromotionChoiceResponseCallback = std::function<void(const Board&)>;
+[[nodiscard]] auto toString(GameError) -> std::string;
 class GameManager {
  public:
   GameManager(Board board);
@@ -24,6 +25,7 @@ class GameManager {
   [[nodiscard]] auto getBoard() const -> const Board&;
   [[nodiscard]] auto isCheckMate() const -> bool;
   [[nodiscard]] auto isStaleMate() const -> bool;
+  auto startGame() -> void;
 
  private:
   auto makePawnMove(Move move) -> void;
@@ -35,6 +37,9 @@ class GameManager {
   auto shouldSetEnpassant(Move move) const -> bool;
   // sets enpassant status to false for all pawns belonging to player
   auto setEnpassantStatusToFalseForAllPawns(Turn player) -> void;
+  auto movePrompt() const -> void;
+  auto printBoard() const -> void;
+  auto isInvalidMove(Move move) const -> std::optional<GameError>;
 
   mutable Board m_board;
   Turn m_turn;

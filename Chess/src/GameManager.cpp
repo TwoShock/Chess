@@ -5,6 +5,7 @@
 #include <cmath>
 #include <format>
 #include <iostream>
+#include <regex>
 #include <utils.hpp>
 namespace chess {
 namespace {
@@ -68,21 +69,9 @@ GameManager::GameManager(Board board)
           defaultPrePromotionChocieResponseCallback) {}
 
 auto GameManager::playTurn(Move move) -> std::expected<void, GameError> {
-  const auto [startPosition, endPosition] = move;
-  if (!m_board.hasPiece(startPosition)) {
-    return std::unexpected(GameError::CanNotMoveEmptyCell);
-  }
-  if (m_board.hasPiece(startPosition, turnToColor(getOtherPlayersTurn()))) {
-    return std::unexpected(GameError::CanNotMoveEnemyPiece);
-  }
-  const PieceVariant* piece = m_board.getCell(startPosition)->getPiece();
-  const Moves possibleMoves = std::visit(
-      [&startPosition, this](const auto& piece) {
-        return piece.getPossibleMoves(startPosition, m_board);
-      },
-      *piece);
-  if (!possibleMoves.contains(move)) {
-    return std::unexpected(GameError::InvalidMove);
+  std::optional<GameError> error{isInvalidMove(move)};
+  if (error.has_value()) {
+    return std::unexpected(*error);
   }
   makeMove(move);
 }
@@ -267,6 +256,33 @@ auto GameManager::setEnpassantStatusToFalseForAllPawns(Turn player) -> void {
         }
       });
 }
+auto GameManager::movePrompt() const -> void {
+  const std::string prompt{std::format(
+      "It is {} turn. Enter your move (e.g, 'a1 a5'):", toString(m_turn))};
+  std::cout << prompt;
+}
+auto GameManager::printBoard() const -> void {
+  std::cout << m_board << "\n";
+}
+auto GameManager::isInvalidMove(Move move) const -> std::optional<GameError> {
+  const auto [startPosition, endPosition] = move;
+  if (!m_board.hasPiece(startPosition)) {
+    return GameError::CanNotMoveEmptyCell;
+  }
+  if (m_board.hasPiece(startPosition, turnToColor(getOtherPlayersTurn()))) {
+    return GameError::CanNotMoveEnemyPiece;
+  }
+  const PieceVariant* piece = m_board.getCell(startPosition)->getPiece();
+  const Moves possibleMoves = std::visit(
+      [&startPosition, this](const auto& piece) {
+        return piece.getPossibleMoves(startPosition, m_board);
+      },
+      *piece);
+  if (!possibleMoves.contains(move)) {
+    return GameError::InvalidMove;
+  }
+  return std::nullopt;
+}
 auto GameManager::getBoard() const -> const Board& {
   return m_board;
 }
@@ -299,5 +315,58 @@ auto GameManager::isStaleMate() const -> bool {
         }
       });
   return staleMate;
+}
+
+namespace {
+auto isValidInput(const std::string& input) -> bool {
+  std::regex moveFormat("^([a-h][1-8])\\s([a-h][1-8])$");
+  return std::regex_match(input, moveFormat);
+}
+auto getValidInput() -> std::string {
+  std::string moveInput;
+  std::getline(std::cin, moveInput);
+  while (!isValidInput(moveInput)) {
+    std::cout << "Invalid input! Use the format 'a1 a5'.\n";
+    std::getline(std::cin, moveInput);
+  }
+  return moveInput;
+}
+}  // namespace
+
+auto GameManager::startGame() -> void {
+  while (!isCheckMate() && !isStaleMate()) {
+    printBoard();
+    movePrompt();
+    std::string moveInput = getValidInput();
+    Move move = toMove(moveInput);
+    std::optional<GameError> moveError{isInvalidMove(move)};
+    while (moveError.has_value()) {
+      std::cout << toString(*moveError) << "\n";
+      moveInput = getValidInput();
+      move = toMove(moveInput);
+      moveError = isInvalidMove(move);
+    }
+    playTurn(move);
+  }
+  if (isCheckMate()) {
+    const std::string victoryMessage{
+        std::format("{} wins.", toString(getOtherPlayersTurn()))};
+    std::cout << victoryMessage;
+  }
+  if (isStaleMate()) {
+    std::cout << "Stalemate achieved.";
+  }
+}
+auto toString(GameError error) -> std::string {
+  switch (error) {
+    case GameError::CanNotMoveEmptyCell:
+      return "You cannot move an empty cell.";
+    case GameError::CanNotMoveEnemyPiece:
+      return "You cannot move an enemy piece.";
+    case GameError::InvalidMove:
+      return "The move is invalid.";
+    default:
+      return "Unknown error.";
+  }
 }
 }  // namespace chess
