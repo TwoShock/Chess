@@ -68,7 +68,9 @@ TEST(
                                                  {{{knightPos, {6, 2}},
                                                    {knightPos, {6, 4}},
                                                    {knightPos, {5, 1}},
-                                                   {knightPos, {5, 5}}}});
+                                                   {knightPos, {5, 5}},
+                                                   {knightPos, {3, 1}},
+                                                   {knightPos, {3, 5}}}});
 }
 
 TEST(KnightTest, sideKnightMovementTest) {

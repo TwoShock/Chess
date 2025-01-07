@@ -124,12 +124,14 @@ auto getKnightTypeMoves(const Piece& piece,
                         const Board& board) -> Moves {
   Moves possibleMoves;
   auto [x, y] = startPosition;
-  const Position upRight{x + 2, y + 1};
-  const Position upLeft{x + 2, y - 1};
-  const Position downRight{x - 2, y + 1};
-  const Position downLeft{x - 2, y - 1};
-  const Position rightUp{x + 1, y + 2};
-  const Position leftUp{x + 1, y - 2};
+  const Position upTwiceOnceRight{x + 2, y + 1};
+  const Position upTwiceOnceLeft{x + 2, y - 1};
+  const Position downTwiceOnceRight{x - 2, y + 1};
+  const Position downTwiceOnceLeft{x - 2, y - 1};
+  const Position rightTwiceUpOnce{x + 1, y + 2};
+  const Position rightTwiceDownOnce{x - 1, y + 2};
+  const Position leftTwiceUpOnce{x + 1, y - 2};
+  const Position leftTwiceDownOnce{x - 1, y - 2};
 
   auto updatePossibleMoves = [&piece, &board, &possibleMoves,
                               &startPosition](Position position) {
@@ -141,12 +143,14 @@ auto getKnightTypeMoves(const Piece& piece,
       possibleMoves.insert({startPosition, position});
     }
   };
-  updatePossibleMoves(upRight);
-  updatePossibleMoves(upLeft);
-  updatePossibleMoves(downRight);
-  updatePossibleMoves(downLeft);
-  updatePossibleMoves(rightUp);
-  updatePossibleMoves(leftUp);
+  updatePossibleMoves(upTwiceOnceRight);
+  updatePossibleMoves(upTwiceOnceLeft);
+  updatePossibleMoves(downTwiceOnceRight);
+  updatePossibleMoves(downTwiceOnceLeft);
+  updatePossibleMoves(rightTwiceDownOnce);
+  updatePossibleMoves(rightTwiceUpOnce);
+  updatePossibleMoves(leftTwiceUpOnce);
+  updatePossibleMoves(leftTwiceDownOnce);
 
   return possibleMoves;
 }

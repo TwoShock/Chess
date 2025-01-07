@@ -211,3 +211,25 @@ TEST(GameManagerTest,GivenStaleMateSituation_ExpectGameMangerToDetectIt ) {
 //  GameManager gameManager{Board{}};
 //  gameManager.startGame();
 //}
+
+TEST(KingTest, performCastlingTest) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(Rook(Color::Black)),   Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::Black)),   Cell(),                     Cell(),                     Cell(Rook(Color::Black))},//0
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//1
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//6
+{Cell(Rook(Color::White)),   Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::White)),   Cell(),                     Cell(),                     Cell(Rook(Color::White))}//7
+      // clang-format on
+  };
+  GameManager gameManager{Board{intialBoardState}};
+  gameManager.playTurn({{7, 4}, {7, 2}});
+  gameManager.playTurn({{0, 4}, {0, 6}});
+  std::stringstream ss;
+  ss << gameManager.getBoard();
+  EXPECT_EQ(test::readFileContents("resources/CastlingBothSides.txt"),ss.str());
+}

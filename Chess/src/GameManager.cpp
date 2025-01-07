@@ -159,7 +159,7 @@ auto findCastlingMoveFromMove(Move move,
   CastlingMove cMove;
   for (const auto& castlingMove : castlingMoves) {
     if (castlingMove.first == move) {
-      return cMove;
+      return castlingMove;
     }
   }
   return {};
