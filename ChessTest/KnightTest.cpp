@@ -98,3 +98,26 @@ TEST(KnightTest, sideKnightMovementTest) {
       test::readFileContents("resources/SideKnightMovementTest.txt");
   EXPECT_EQ(expectedMovement, ss.str());
 }
+TEST(KnightTest, middleKnightMovementTest) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(),                     Cell(),                     Cell(),                     Cell(King(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(Knight(Color::White)),Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(Rook(Color::White)),   Cell(Knight(Color::White)), Cell(),                     Cell(Queen(Color::White)), Cell(King(Color::White)),   Cell(Bishop(Color::White)), Cell(Knight(Color::White)), Cell(Rook(Color::White))}//7
+      // clang-format on
+  };
+  Board board{intialBoardState};
+  const Position knightPos{4, 3};
+  board.highlightMoves(knightPos);
+  std::stringstream ss;
+  ss << board;
+  const std::string expectedMovement =
+      test::readFileContents("resources/MiddleKnightMovementTest.txt");
+  EXPECT_EQ(expectedMovement, ss.str());
+}
