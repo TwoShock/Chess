@@ -188,7 +188,7 @@ TEST(GameManagerTest, GivenNoCheckMate_ExpectGameMangerToDetectIt) {
   EXPECT_FALSE(gameManager.isStaleMate());
 }
 
-TEST(GameManagerTest,GivenStaleMateSituation_ExpectGameMangerToDetectIt ) {
+TEST(GameManagerTest, GivenStaleMateSituation_ExpectGameMangerToDetectIt) {
   const std::vector<std::vector<Cell>> intialBoardState{
       // clang-format off
 /*0                                       1                         2                        3                          4                          5                           6                                 7*/
@@ -207,12 +207,12 @@ TEST(GameManagerTest,GivenStaleMateSituation_ExpectGameMangerToDetectIt ) {
   EXPECT_TRUE(gameManager.isStaleMate());
   EXPECT_FALSE(gameManager.isCheckMate());
 }
-//TEST(GameMangerTest, dummy) {
-//  GameManager gameManager{Board{}};
-//  gameManager.startGame();
-//}
+// TEST(GameMangerTest, dummy) {
+//   GameManager gameManager{Board{}};
+//   gameManager.startGame();
+// }
 
-TEST(KingTest, performCastlingTest) {
+TEST(GameMangerTest, performCastlingTest) {
   const std::vector<std::vector<Cell>> intialBoardState{
       // clang-format off
 /*0                                       1                         2                        3                          4                          5                           6                                 7*/
@@ -231,5 +231,27 @@ TEST(KingTest, performCastlingTest) {
   gameManager.playTurn({{0, 4}, {0, 6}});
   std::stringstream ss;
   ss << gameManager.getBoard();
-  EXPECT_EQ(test::readFileContents("resources/CastlingBothSides.txt"),ss.str());
+  EXPECT_EQ(test::readFileContents("resources/CastlingBothSides.txt"),
+            ss.str());
+}
+
+TEST(GameMangerTest, performEnpassantTest) {
+  const std::vector<std::vector<Cell>> intialBoardState{
+      // clang-format off
+/*0                                       1                         2                        3                          4                          5                           6                                 7*/
+{Cell(Rook(Color::Black)),   Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::Black)),   Cell(),                     Cell(),                     Cell(Rook(Color::Black))},//0
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//1
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//2
+{Cell(),                     Cell(),                     Cell(Pawn(Color::White)),   Cell(Pawn(Color::Black)), Cell(),                     Cell(),                     Cell(),                     Cell()},//3
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//4
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//5
+{Cell(),                     Cell(),                     Cell(),                     Cell(),                   Cell(),                     Cell(),                     Cell(),                     Cell()},//6
+{Cell(Rook(Color::White)),   Cell(),                     Cell(),                     Cell(),                   Cell(King(Color::White)),   Cell(),                     Cell(),                     Cell(Rook(Color::White))}//7
+      // clang-format on
+  };
+  GameManager gameManager{Board{intialBoardState}};
+  auto& board = const_cast<Board&>(gameManager.getBoard());
+  const_cast<Pawn*>(board.getPiece<Pawn>({3, 3}))->setCanBeTakenByEnpassant(true);
+  gameManager.playTurn({{3, 2}, {2, 3}});
+  EXPECT_TRUE(board.hasPiece<Pawn>({2, 3}));
 }

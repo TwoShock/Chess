@@ -20,6 +20,9 @@ auto turnToColor(Turn turn) -> Color {
   };
 }
 bool isNumber(const std::string& str) {
+  if (str.empty()) {
+    return false;
+  }
   for (char c : str) {
     if (!std::isdigit(c)) {
       return false;
@@ -41,6 +44,8 @@ auto defaultPromotionCallback(Position position,
   int userChoice;
   std::string userInput;
   while (true) {
+    std::cout << promotionMessage;
+    std::cout << options;
     std::getline(std::cin, userInput);
     if (isNumber(userInput)) {
       userChoice = std::stoi(userInput);
@@ -123,11 +128,57 @@ auto getLastRowWithRespectToCurrentPlayer(Turn turn) -> int {
     }
   };
 }
+enum class EnpassantDirection { Left, Right };
+auto getEnpassantDirection(Move move, const Board& board)
+    -> std::optional<EnpassantDirection> {
+  const auto [startPosition, endPosition] = move;
+  const auto [sx, sy] = startPosition;
+  const Pawn* pawn = board.getPiece<Pawn>(startPosition);
+  const Color color = pawn->getColor();
+  const auto columnDisplacement = startPosition.second - endPosition.second;
+  if (columnDisplacement == 1) {
+    if (board.hasPiece<Pawn>({sx, sy + 1}, pawn->getOppositeColor()) &&
+        board.getPiece<Pawn>({sx, sy + 1})->canBeTakenByEnpassant()) {
+      return EnpassantDirection::Right;
+    }
+  } else if (columnDisplacement == -1) {
+    if (board.hasPiece<Pawn>({sx, sy - 1}, pawn->getOppositeColor()) &&
+        board.getPiece<Pawn>({sx, sy - 1})->canBeTakenByEnpassant()) {
+      return EnpassantDirection::Left;
+    }
+  }
+  return std::nullopt;
+}
+auto removePieceInEnpassantMoveDirection(
+    Move move,
+    std::optional<EnpassantDirection> direction,
+    Board& board) {
+  if (!direction.has_value()) {
+    return;
+  }
+  const auto [startPosition, _] = move;
+  const auto [sx, sy] = startPosition;
+
+  switch (direction.value()) {
+    case EnpassantDirection::Right: {
+      board.setPiece({sx, sy + 1}, std::nullopt);
+      break;
+    }
+    case EnpassantDirection::Left: {
+      board.setPiece({sx, sy - 1}, std::nullopt);
+      break;
+    }
+  }
+}
+
 }  // namespace
+
 auto GameManager::makePawnMove(Move move) -> void {
   const auto [startPosition, endPosition] = move;
-  m_board.setPiece(endPosition, *m_board.getPiece<Pawn>(startPosition));
-  m_board.setPiece(startPosition, std::nullopt);
+  const Pawn* pawnStart = m_board.getPiece<Pawn>(startPosition);
+  removePieceInEnpassantMoveDirection(
+      move, getEnpassantDirection(move, m_board), m_board);
+  m_board.movePiece(*pawnStart, move);
   Pawn* pawn = const_cast<Pawn*>(m_board.getPiece<Pawn>(endPosition));
   if (endPosition.first ==
       getLastRowWithRespectToCurrentPlayer(getCurrentTurn())) {

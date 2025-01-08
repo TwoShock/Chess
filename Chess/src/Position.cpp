@@ -12,7 +12,7 @@ auto mergePositionSets(const std::vector<PositionSet>& postionSets)
 }
 auto toChessCoordinates(Position position) -> std::string {
   auto [x, y] = position;
-  return std::format("{}{}", columnLetters[y], columnLetters[x]);
+  return std::format("{}{}", columnLetters[y], rowNumbers[x]);
 }
 
 auto toString(Position position) -> std::string {
