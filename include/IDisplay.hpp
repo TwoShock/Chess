@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-namespace {
+namespace chess{
 class IDisplay {
  public:
   virtual auto display() const -> std::string = 0;

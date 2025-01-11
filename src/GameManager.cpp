@@ -18,6 +18,7 @@ auto turnToColor(Turn turn) -> Color {
       return Color::Black;
     }
   };
+  return Color::Black;
 }
 bool isNumber(const std::string& str) {
   if (str.empty()) {
@@ -31,8 +32,8 @@ bool isNumber(const std::string& str) {
   return true;
 }
 
-auto defaultPromotionCallback(Position position,
-                              Color pawnColor) -> PromotionChoice {
+auto defaultPromotionCallback(Position position, Color pawnColor)
+    -> PromotionChoice {
   const std::string promotionMessage = std::format(
       "What would you like to promote {} Pawn at position {} to ?\n",
       toString(pawnColor), toString(position));
@@ -79,17 +80,18 @@ auto GameManager::playTurn(Move move) -> std::expected<void, GameError> {
     return std::unexpected(*error);
   }
   makeMove(move);
+  return std::expected<void,GameError>();
 }
 
 auto GameManager::switchTurn() -> void {
   switch (m_turn) {
     case Turn::White: {
       m_turn = Turn::Black;
-      break;
+      return;
     }
     case Turn::Black: {
       m_turn = Turn::White;
-      break;
+      return;
     }
   };
 }
@@ -105,6 +107,7 @@ auto GameManager::getOtherPlayersTurn() const -> Turn {
       return Turn::White;
     }
   };
+  return Turn::White;
 }
 auto GameManager::setPromotionCallback(PromotionCallback promotionCallback)
     -> void {
@@ -127,6 +130,7 @@ auto getLastRowWithRespectToCurrentPlayer(Turn turn) -> int {
       return LastRowWithRespectToBlack;
     }
   };
+  return LastRowWithRespectToBlack;
 }
 enum class EnpassantDirection { Left, Right };
 auto getEnpassantDirection(Move move, const Board& board)

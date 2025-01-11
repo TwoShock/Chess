@@ -1,5 +1,6 @@
 #include <Move.hpp>
 #include <Position.hpp>
+#include <algorithm>
 namespace chess {
 auto mergeMoveSets(std::initializer_list<Moves> moves) -> Moves {
   Moves result;

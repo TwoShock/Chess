@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 namespace chess {
 inline std::array<char, 8> columnLetters = {'a', 'b', 'c', 'd',
                                             'e', 'f', 'g', 'h'};

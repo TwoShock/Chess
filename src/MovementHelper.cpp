@@ -45,6 +45,7 @@ auto toDirectionPair(Direction direction) -> std::pair<int, int> {
       return {-1, 0};
     }
   }
+  return {-10, -10};
 }
 auto getAllEndingPositionsForDirection(const Piece& piece,
                                        Position startPosition,

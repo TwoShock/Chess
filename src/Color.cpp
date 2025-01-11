@@ -8,6 +8,7 @@ auto getOppositeColor(Color color) -> Color {
     case Color::White:
       return Color::Black;
   };
+  return Color::Black;
 }
 auto toString(Color color) -> std::string {
   switch (color) {
@@ -16,5 +17,6 @@ auto toString(Color color) -> std::string {
     case Color::White:
       return "White";
   };
+  return "White";
 }
 }  // namespace chess

@@ -4,8 +4,8 @@
 #include <optional>
 namespace chess {
 
-auto King::getPossibleMoves(Position startPosition,
-                            const Board& board) const -> Moves {
+auto King::getPossibleMoves(Position startPosition, const Board& board) const
+    -> Moves {
   const auto [x, y] = startPosition;
   const Position forward{x + 1, y};
   const Position backward{x - 1, y};
@@ -70,8 +70,9 @@ auto existsPiecesBetweenKingAndRook(Position kingPosition,
   return false;
 }
 }  // namespace
-auto King::getRightCastlingMove(Position startPosition, const Board& board)
-    const -> std::optional<CastlingMove> {
+auto King::getRightCastlingMove(Position startPosition,
+                                const Board& board) const
+    -> std::optional<CastlingMove> {
   const auto [x, y] = startPosition;
   const int startingRow = getStartingRow();
   const Position rightRookPosition{startingRow, y + 3};
@@ -134,6 +135,7 @@ auto King::getStartingRow() const -> int {
       return 0;
     }
   }
+  return 0;
 }
 
 }  // namespace chess

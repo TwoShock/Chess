@@ -11,6 +11,7 @@ auto Piece::getOppositeColor() const -> Color {
       return Color::White;
     }
   }
+  return Color::White;
 }
 auto Piece::isFriendly(const Piece& other) const -> bool {
   return other.getColor() == getColor();

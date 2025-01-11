@@ -79,6 +79,7 @@ auto Pawn::getForwardDirection() const -> int {
       return 1;
     }
   }
+  return 1;
 }
 
 auto Pawn::getPositionsOfInterest(Position startPosition) const
