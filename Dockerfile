@@ -21,5 +21,11 @@ RUN mkdir build
 WORKDIR /app/build
 RUN cmake .. && cmake --build .
 
+ENV RUN_TESTS=true
 # Run tests
-CMD ["./ChessTest"]
+# Fixed CMD instruction with proper syntax
+CMD if [ "${RUN_TESTS}" = "true" ]; then \
+        ./ChessTest; \
+    else \
+        ./ChessGame; \
+    fi

@@ -3,6 +3,7 @@ project(Chess)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB SOURCES "src/*.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "src/main.cpp")
 file(GLOB HEADERS "include/*.hpp")
 add_library(Chess STATIC ${SOURCES} ${HEADERS})
 
