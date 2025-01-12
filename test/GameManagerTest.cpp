@@ -207,10 +207,6 @@ TEST(GameManagerTest, GivenStaleMateSituation_ExpectGameMangerToDetectIt) {
   EXPECT_TRUE(gameManager.isStaleMate());
   EXPECT_FALSE(gameManager.isCheckMate());
 }
-// TEST(GameMangerTest, dummy) {
-//   GameManager gameManager{Board{}};
-//   gameManager.startGame();
-// }
 
 TEST(GameMangerTest, performCastlingTest) {
   const std::vector<std::vector<Cell>> intialBoardState{

@@ -31,3 +31,8 @@ add_custom_command(TARGET ChessTest POST_BUILD
         ${CMAKE_SOURCE_DIR}/test/resources
         ${CMAKE_BINARY_DIR}/resources
 )
+
+# Add a separate executable for running the game
+file(GLOB MAIN_CPP "src/main.cpp")
+add_executable(ChessGame ${MAIN_CPP})
+target_link_libraries(ChessGame PRIVATE Chess)
