@@ -1,10 +1,14 @@
 #pragma once
 #include <Board.hpp>
+#include <History.hpp>
 #include <Turn.hpp>
+
 #include <expected>
 #include <functional>
 #include <unordered_map>
 #include <variant>
+#include <vector>
+
 namespace chess {
 enum class GameError { CanNotMoveEmptyCell, CanNotMoveEnemyPiece, InvalidMove };
 enum class PromotionChoice { Queen = 1, Rook = 2, Bishop = 3, Knight = 4 };
@@ -25,6 +29,8 @@ class GameManager {
   [[nodiscard]] auto getBoard() const -> const Board&;
   [[nodiscard]] auto isCheckMate() const -> bool;
   [[nodiscard]] auto isStaleMate() const -> bool;
+  auto undoMove() -> void;
+  auto redoMove() -> void;
   auto startGame() -> void;
 
  private:
@@ -40,11 +46,14 @@ class GameManager {
   auto movePrompt() const -> void;
   auto printBoard() const -> void;
   auto isInvalidMove(Move move) const -> std::optional<GameError>;
+  enum class MoveCommand { Undo, Redo, Quit, Move };
+  auto toMoveCommand(std::string moveInput) -> MoveCommand;
 
   mutable Board m_board;
   Turn m_turn;
   int m_turnCounter;
   PromotionCallback m_promotionCallback;
   PrePromotionChoiceResponseCallback m_prePromotionChocieResponseCallback;
+  History m_history;
 };
 }  // namespace chess

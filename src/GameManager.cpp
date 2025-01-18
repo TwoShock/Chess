@@ -32,8 +32,8 @@ bool isNumber(const std::string& str) {
   return true;
 }
 
-auto defaultPromotionCallback(Position position, Color pawnColor)
-    -> PromotionChoice {
+auto defaultPromotionCallback(Position position,
+                              Color pawnColor) -> PromotionChoice {
   const std::string promotionMessage = std::format(
       "What would you like to promote {} Pawn at position {} to ?\n",
       toString(pawnColor), toString(position));
@@ -72,7 +72,9 @@ GameManager::GameManager(Board board)
       m_turnCounter(0),
       m_promotionCallback(defaultPromotionCallback),
       m_prePromotionChocieResponseCallback(
-          defaultPrePromotionChocieResponseCallback) {}
+          defaultPrePromotionChocieResponseCallback) {
+  m_history.logMove({m_board, Turn::White});
+}
 
 auto GameManager::playTurn(Move move) -> std::expected<void, GameError> {
   std::optional<GameError> error{isInvalidMove(move)};
@@ -80,7 +82,7 @@ auto GameManager::playTurn(Move move) -> std::expected<void, GameError> {
     return std::unexpected(*error);
   }
   makeMove(move);
-  return std::expected<void,GameError>();
+  return std::expected<void, GameError>();
 }
 
 auto GameManager::switchTurn() -> void {
@@ -273,6 +275,8 @@ auto GameManager::makeMove(Move move) -> void {
       *pieceVariant);
   switchTurn();
   setEnpassantStatusToFalseForAllPawns(getCurrentTurn());
+  m_history.clearFuture();
+  m_history.logMove({m_board, getCurrentTurn()});
 }
 auto GameManager::promotePawn(Position position,
                               PromotionChoice promotionChoice) -> void {
@@ -314,6 +318,7 @@ auto GameManager::setEnpassantStatusToFalseForAllPawns(Turn player) -> void {
 auto GameManager::movePrompt() const -> void {
   const std::string prompt{std::format(
       "It is {} turn. Enter your move (e.g, 'a1 a5'):", toString(m_turn))};
+  std::cout << "'u' for undo. 'r' for redo. 'q' for quit \n";
   std::cout << prompt;
 }
 auto GameManager::printBoard() const -> void {
@@ -372,6 +377,22 @@ auto GameManager::isStaleMate() const -> bool {
   return staleMate;
 }
 
+auto GameManager::undoMove() -> void {
+  std::optional<GameState> state = m_history.undo();
+  if (state.has_value()) {
+    m_board = state.value().first;
+    m_turn = state.value().second;
+  }
+}
+
+auto GameManager::redoMove() -> void {
+  std::optional<GameState> state = m_history.redo();
+  if (state.has_value()) {
+    m_board = state.value().first;
+    m_turn = state.value().second;
+  }
+}
+
 namespace {
 auto isValidInput(const std::string& input) -> bool {
   std::regex moveFormat("^([a-h][1-8])\\s([a-h][1-8])$");
@@ -380,6 +401,9 @@ auto isValidInput(const std::string& input) -> bool {
 auto getValidInput() -> std::string {
   std::string moveInput;
   std::getline(std::cin, moveInput);
+  if (moveInput == "u" || moveInput == "r" || moveInput == "q") {
+    return moveInput;
+  }
   while (!isValidInput(moveInput)) {
     std::cout << "Invalid input! Use the format 'a1 a5'.\n";
     std::getline(std::cin, moveInput);
@@ -388,26 +412,56 @@ auto getValidInput() -> std::string {
 }
 }  // namespace
 
+auto GameManager::toMoveCommand(std::string moveInput) -> MoveCommand {
+  if (moveInput == "u") {
+    return MoveCommand::Undo;
+  } else if (moveInput == "r") {
+    return MoveCommand::Redo;
+
+  } else if (moveInput == "q") {
+    return MoveCommand::Quit;
+  }
+  return MoveCommand::Move;
+}
 auto GameManager::startGame() -> void {
   while (!isCheckMate() && !isStaleMate()) {
     printBoard();
     movePrompt();
+
+  process_input:
     std::string moveInput = getValidInput();
-    Move move = toMove(moveInput);
-    std::optional<GameError> moveError{isInvalidMove(move)};
-    while (moveError.has_value()) {
-      std::cout << toString(*moveError) << "\n";
-      moveInput = getValidInput();
-      move = toMove(moveInput);
-      moveError = isInvalidMove(move);
+    MoveCommand command = toMoveCommand(moveInput);
+
+    switch (command) {
+      case MoveCommand::Undo: {
+        undoMove();
+        continue;
+      }
+      case MoveCommand::Redo: {
+        redoMove();
+        continue;
+      }
+      case MoveCommand::Quit: {
+        return;
+      }
+      case MoveCommand::Move: {
+        Move move = toMove(moveInput);
+        std::optional<GameError> moveError{isInvalidMove(move)};
+        if (moveError.has_value()) {
+          std::cout << toString(*moveError) << "\n";
+          goto process_input;
+        }
+        playTurn(move);
+      }
     }
-    playTurn(move);
   }
+
   if (isCheckMate()) {
     const std::string victoryMessage{
         std::format("{} wins.", toString(getOtherPlayersTurn()))};
     std::cout << victoryMessage;
   }
+
   if (isStaleMate()) {
     std::cout << "Stalemate achieved.";
   }
